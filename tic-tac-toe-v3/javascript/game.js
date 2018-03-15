@@ -26,9 +26,21 @@
     }
   });
 
-  $('.box').on('hover', function (event) {
-
-  });
+  $('.box').hover(
+    function (event) {
+      if ($('#player1').is('.active')) {
+        $(this).css("background-image", "url(img/o.svg)");
+      } else if ($('#player2').is('.active')) {
+        $(this).css("background-image", "url(img/x.svg)");
+      }
+    },
+    function (event) {
+      if ($('#player1').is('.active')) {
+        $(this).css("background-image", "");
+      } else if ($('#player2').is('.active')) {
+        $(this).css("background-image", "");
+      }
+    });
 
 
 }());
