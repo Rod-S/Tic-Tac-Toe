@@ -26,21 +26,24 @@
     }
   });
 
-  $('.box').hover(
-    function (event) {
-      if ($('#player1').is('.active')) {
-        $(this).css("background-image", "url(img/o.svg)");
-      } else if ($('#player2').is('.active')) {
-        $(this).css("background-image", "url(img/x.svg)");
-      }
-    },
-    function (event) {
-      if ($('#player1').is('.active')) {
-        $(this).css("background-image", "");
-      } else if ($('#player2').is('.active')) {
-        $(this).css("background-image", "");
-      }
-    });
-
-
+  const hoverCheck = () => {
+    $('.box').hover(
+      function (event) {
+      if ($(this).hasClass('box-filled-1')) {return}
+      if ($(this).hasClass('box-filled-2')) {return}
+        if ($('#player1').is('.active')) {
+          $(this).css("background-image", "url(img/o.svg)");
+        } else if ($('#player2').is('.active')) {
+          $(this).css("background-image", "url(img/x.svg)");
+        }
+      },
+      function (event) {
+        if ($('#player1').is('.active')) {
+          $(this).css("background-image", "");
+        } else if ($('#player2').is('.active')) {
+          $(this).css("background-image", "");
+        }
+      });
+  }
+  hoverCheck();
 }());
