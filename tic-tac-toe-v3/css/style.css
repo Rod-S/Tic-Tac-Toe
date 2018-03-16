@@ -21,6 +21,7 @@ h1 {
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
   display: inline-block;
   padding: 1.25em 3em;
+  margin: 10px;
   text-decoration: none;
   -webkit-transition: 0.25s ease;
   transition: 0.25s ease; }
@@ -65,7 +66,7 @@ h1 {
       line-height: 0;
       z-index: -1; }
   .screen-win-tie {
-    background: #54D17A; }   
+    background: #54D17A; }
   .screen-win-one {
     background: #FFA000; }
     .screen-win-one .button {
@@ -125,7 +126,7 @@ h1 {
     padding: 1.75em;
     cursor: pointer;
     box-sizing: border-box;
-    transition: 0.2s ease; 
+    transition: 0.2s ease;
     background-size: 100px 100px;
     background-repeat: no-repeat;
     background-position: center center;}
@@ -138,4 +139,17 @@ h1 {
       background-color: #3688C3;
       background-image: url(../img/x.svg); }
 
+    .names {
+      color: rgba(0, 0, 0, 1);
+      text-align: center;
+      position: fixed;
+      width: 35%;
+      }
 
+    #player2.names {
+      display: inline-block;
+      color: rgba(0, 0, 0, 1);
+      text-align: right;
+      position: fixed;
+      width: 35%;
+      }
