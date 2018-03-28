@@ -41,16 +41,35 @@
   startScreen();
 
 
-
+/*
   function containsAll(winArray,pArray) {
      for (var i=0; i < winArray[i].length; i++) {
       for (var j=0; j < winArray[j].length; j++) {
          if($.inArray(winArray[i][j] , pArray) == -1) return false;
        }
-return true;
+       return true;
      }
-
   }
+*/
+
+/*
+function containsAll(winArray,pArray) {
+   for (var i=0; i < winArray.length; i++) {
+    for (var j=0; j < winArray[i].length; j++) {
+       if($.inArray(winArray[i][j] , pArray) > -1) return true;
+     }
+   }
+return false;
+}
+*/
+
+function containsAll(winCombos, pArray) {
+   for (var i=0; i < winCombos.length; i++) {
+    if(winCombos[i].every(value => pArray.indexOf(value) != -1)) return true;
+   }
+return false;
+}
+
 
 
   $('.box').on('click', function (event) {
@@ -64,6 +83,9 @@ return true;
       $('#player1').toggleClass('active');
       $('#player2').toggleClass('active');
       console.log(containsAll(winCombos, p1box));
+      if (containsAll(winCombos, p1box)) {
+        $('#board').hide();
+      };
     } else if ($('#player2').is('.active')){
       p2box.push($(this).attr('class').split(' ')[1]);
       console.log('p2box: ' + p2box);
