@@ -25,6 +25,19 @@
       $('#start1').after('<a href="#" class="button" id="start2">2-Player</a>');
       $('#startButton').hide();
 
+      $("#start1").on('click', function(){
+        player_1 = '';
+        player_1 = prompt('Please enter a name for player 1', 'Player 1');
+        window.player_1 = player_1;
+        $('#start').hide();
+        $('#board').show();
+        $('#player1').append('<h3 class=names>' + player_1 + '</h2>');
+        $('#player2').append('<h3 class=names>Computer</h2>');
+        $('#player2').removeClass('active');
+        $('#player1').addClass('active');
+      });
+
+
       $('#start2').on('click', function (){
         player_1 = '';
         player_2 = '';
@@ -38,18 +51,21 @@
         $('#player2').append('<h3 class=names>' + player_2 + '</h2>');
         $('#player2').removeClass('active');
         $('#player1').addClass('active');
+        playerMoves();
+        hoverCheck();
+        tieScreen();
       });
     });
   }
   startScreen();
 
 
-function containsAll(winCombos, pArray) {
+const containsAll = (winCombos, pArray) => {
    for (var i=0; i < winCombos.length; i++) {
     if(winCombos[i].every(value => pArray.indexOf(value) != -1)) return true;
    }
 return false;
-}
+};
 
 const playerMoves = () => {
   $('.box').on('click', function (event) {
@@ -82,7 +98,6 @@ const playerMoves = () => {
     }
   });
 }
-playerMoves();
 
   const hoverCheck = () => {
     $('.box').hover(
@@ -105,7 +120,6 @@ playerMoves();
       }
       });
     }
-  hoverCheck();
 
   const tieScreen = () => {
 
@@ -121,7 +135,6 @@ playerMoves();
       }
     })
   }
-tieScreen();
 
 const newGame = () => {
   $('.newButton').on('click', function() {
@@ -138,7 +151,5 @@ const newGame = () => {
   });
 }
 newGame();
-
-
 
 }());
