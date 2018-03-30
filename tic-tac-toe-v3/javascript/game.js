@@ -10,7 +10,6 @@
     ['box_1', 'box_5', 'box_9'],
     ['box_3', 'box_5', 'box_7']];
 
-
   let p1box = [];
   let p2box = [];
 
@@ -27,41 +26,23 @@
       $('#startButton').hide();
 
       $('#start2').on('click', function (){
-
+        player_1 = '';
+        player_2 = '';
         player_1 = prompt('Please enter a name for player 1', 'Player 1');
         player_2 = prompt('Please enter a name for player 2', 'Player 2');
+        window.player_1 = player_1;
+        window.player_2 = player_2;
         $('#start').hide();
         $('#board').show();
         $('#player1').append('<h3 class=names>' + player_1 + '</h2>');
         $('#player2').append('<h3 class=names>' + player_2 + '</h2>');
+        $('#player2').removeClass('active');
         $('#player1').addClass('active');
       });
     });
   }
   startScreen();
 
-
-/*
-  function containsAll(winArray,pArray) {
-     for (var i=0; i < winArray[i].length; i++) {
-      for (var j=0; j < winArray[j].length; j++) {
-         if($.inArray(winArray[i][j] , pArray) == -1) return false;
-       }
-       return true;
-     }
-  }
-*/
-
-/*
-function containsAll(winArray,pArray) {
-   for (var i=0; i < winArray.length; i++) {
-    for (var j=0; j < winArray[i].length; j++) {
-       if($.inArray(winArray[i][j] , pArray) > -1) return true;
-     }
-   }
-return false;
-}
-*/
 
 function containsAll(winCombos, pArray) {
    for (var i=0; i < winCombos.length; i++) {
@@ -70,33 +51,38 @@ function containsAll(winCombos, pArray) {
 return false;
 }
 
-
-
+const playerMoves = () => {
   $('.box').on('click', function (event) {
     if ($(this).hasClass('box-filled-1')) {return}
     if ($(this).hasClass('box-filled-2')) {return}
     if ($('#player1').is('.active')) {
       p1box.push($(this).attr('class').split(' ')[1]);
-      console.log('p1box: ' + p1box);
       $(this).toggleClass('box-filled box-filled-1');
       $(this).attr('disabled', true);
       $('#player1').toggleClass('active');
       $('#player2').toggleClass('active');
-      console.log(containsAll(winCombos, p1box));
       if (containsAll(winCombos, p1box)) {
         $('#board').hide();
+        $('#finish').removeClass('screen-win-one screen-win-two screen-win-tie');
+        $('#finish').addClass('screen-win-one').show();
+        $('p.message').text(`WINNER ${player_1}!`);
       };
     } else if ($('#player2').is('.active')){
       p2box.push($(this).attr('class').split(' ')[1]);
-      console.log('p2box: ' + p2box);
       $(this).toggleClass('box-filled box-filled-2');
       $(this).attr('disabled', true);
       $('#player1').toggleClass('active');
       $('#player2').toggleClass('active');
-      console.log(containsAll(winCombos, p2box));
+      if (containsAll(winCombos, p2box)) {
+        $('#board').hide();
+        $('#finish').removeClass('screen-win-one screen-win-two screen-win-tie');
+        $('#finish').addClass("screen-win-two").show();
+        $('p.message').text(`WINNER ${player_2}!`);
+      };
     }
   });
-
+}
+playerMoves();
 
   const hoverCheck = () => {
     $('.box').hover(
@@ -121,16 +107,38 @@ return false;
     }
   hoverCheck();
 
-  const winScreen = () => {
+  const tieScreen = () => {
 
     $('.box').on('click', function (){
       if ($('.box-filled').length === 9) {
-        $('#board').hide();
-        $('#finish').show();
+        if (!containsAll(winCombos, p1box) || containsAll(winCombos, p2box)){
+          $('#board').hide();
+          $('#finish').show();
+          $('p.message').text(`IT'S A TIE!`);
+          $('#finish').removeClass('screen-win-one screen-win-two screen-win-tie');
+          $('#finish').addClass('screen-win-tie');
+        }
       }
     })
   }
-winScreen();
+tieScreen();
+
+const newGame = () => {
+  $('.newButton').on('click', function() {
+    p1box = [];
+    p2box = [];
+    $('.names').remove();
+    $('.box')
+      .removeClass('box-filled box-filled-1 box-filled-2')
+      .css('background-image', '');
+    startScreen();
+    hoverCheck();
+    playerMoves();
+    tieScreen();
+  });
+}
+newGame();
+
 
 
 }());

@@ -13,7 +13,9 @@ h1 {
   line-height: 0.7;
   margin: 0 auto;
   text-align: left;
-  width: 1.875em; }
+  width: 1.875em;
+
+}
 
 .button {
   background: #fff;
@@ -21,7 +23,6 @@ h1 {
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
   display: inline-block;
   padding: 1.25em 3em;
-  margin: 10px;
   text-decoration: none;
   -webkit-transition: 0.25s ease;
   transition: 0.25s ease; }
@@ -55,7 +56,8 @@ h1 {
     font-size: 6em;
     font-weight: 700;
     color: #fff;
-    position: relative; }
+    position: relative;
+    margin-bottom: 2em;}
     .screen-win p:before {
       position: absolute;
       left: 0;
@@ -70,17 +72,30 @@ h1 {
   .screen-win-one {
     background: #FFA000; }
     .screen-win-one .button {
-      color: #3688C3; }
+      color: #3688C3;
+/*
+      position: relative;
+      top: 35em; */
+
+    }
     .screen-win-one p:before {
       content: "o";
-      top: 1.75rem; }
+      top: 1.75rem;
+  }
   .screen-win-two {
     background: #3688C3; }
     .screen-win-two .button {
-      color: #FFA000; }
+      color: #FFA000;
+      /*
+      position: relative;
+      top: 35em;
+      */
+       }
     .screen-win-two p:before {
       content: "×";
-      top: 4.5rem; }
+      top: 3.5rem;
+
+    }
 
 .board {
   padding-top: 1em; }
@@ -153,3 +168,31 @@ h1 {
       position: fixed;
       width: 35%;
       }
+
+      #start1 + #start2 {
+        margin-top: 80px;
+      }
+      #start1 {
+        margin-right: 10px;
+      }
+      #start2 {
+        margin-left: 10px;
+      }
+
+      .winTitle {
+        margin-top: -3.6em;
+        margin-bottom: 7em;
+
+      }
+
+      /*
+      #finish h1 {
+        margin-top: -10em;
+      }
+      #finish p.message {
+        margin-top: 100px;
+      }
+      p.message:before {
+        margin-top: .5em;
+      }
+      */
