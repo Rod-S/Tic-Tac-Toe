@@ -12,6 +12,14 @@
 
   let p1box = [];
   let p2box = [];
+  let allbox = [];
+
+  const containsAll = (winCombos, pArray) => {
+     for (var i=0; i < winCombos.length; i++) {
+      if(winCombos[i].every(value => pArray.indexOf(value) != -1)) return true;
+     }
+  return false;
+  };
 
   const startScreen = () => {
     let player_1;
@@ -35,6 +43,11 @@
         $('#player2').append('<h3 class=names>Computer</h2>');
         $('#player2').removeClass('active');
         $('#player1').addClass('active');
+
+        computerMoves();
+        hoverCheck();
+        tieScreen();
+        newGame();
       });
 
 
@@ -54,50 +67,100 @@
         playerMoves();
         hoverCheck();
         tieScreen();
+        newGame();
       });
     });
   }
   startScreen();
 
 
-const containsAll = (winCombos, pArray) => {
-   for (var i=0; i < winCombos.length; i++) {
-    if(winCombos[i].every(value => pArray.indexOf(value) != -1)) return true;
-   }
-return false;
-};
 
-const playerMoves = () => {
-  $('.box').on('click', function (event) {
-    if ($(this).hasClass('box-filled-1')) {return}
-    if ($(this).hasClass('box-filled-2')) {return}
-    if ($('#player1').is('.active')) {
-      p1box.push($(this).attr('class').split(' ')[1]);
-      $(this).toggleClass('box-filled box-filled-1');
-      $(this).attr('disabled', true);
-      $('#player1').toggleClass('active');
-      $('#player2').toggleClass('active');
-      if (containsAll(winCombos, p1box)) {
-        $('#board').hide();
-        $('#finish').removeClass('screen-win-one screen-win-two screen-win-tie');
-        $('#finish').addClass('screen-win-one').show();
-        $('p.message').text(`WINNER ${player_1}!`);
-      };
-    } else if ($('#player2').is('.active')){
-      p2box.push($(this).attr('class').split(' ')[1]);
-      $(this).toggleClass('box-filled box-filled-2');
-      $(this).attr('disabled', true);
-      $('#player1').toggleClass('active');
-      $('#player2').toggleClass('active');
-      if (containsAll(winCombos, p2box)) {
-        $('#board').hide();
-        $('#finish').removeClass('screen-win-one screen-win-two screen-win-tie');
-        $('#finish').addClass("screen-win-two").show();
-        $('p.message').text(`WINNER ${player_2}!`);
-      };
-    }
-  });
-}
+
+  const computerMoves = () => {
+
+    function randomNumber(max) {
+      return Math.floor(Math.random() * Math.floor(max));
+    };
+
+    function getRandomBox() {
+      let randomBox;
+
+      do {
+        randomBox = $('.boxes li')[randomNumber(9)];
+        console.log(randomBox);
+      } while ($.contains(allbox, randomBox));
+
+        allbox.push($(randomBox).attr('class').split(' ')[1]);
+        p2box.push($(randomBox).attr('class').split(' ')[1]);
+        $(randomBox).toggleClass('box-filled box-filled-2');
+        $(randomBox).attr('disabled', true);
+        console.log(allbox);
+        console.log(p1box);
+        console.log(p2box);
+    };
+
+    $('.box').on('click', function (event) {
+      if ($(this).hasClass('box-filled-1')) {return}
+      if ($(this).hasClass('box-filled-2')) {return}
+      if ($('#player1').is('.active')) {
+        p1box.push($(this).attr('class').split(' ')[1]);
+        allbox.push($(this).attr('class').split(' ')[1]);
+        $(this).toggleClass('box-filled box-filled-1');
+        $(this).attr('disabled', true);
+        $('#player1').toggleClass('active');
+        $('#player2').toggleClass('active');
+        getRandomBox();
+        $('#player2').toggleClass('active');
+        $('#player1').toggleClass('active');
+
+        if (containsAll(winCombos, p1box)) {
+          $('#board').hide();
+          $('#finish').removeClass('screen-win-one screen-win-two screen-win-tie');
+          $('#finish').addClass('screen-win-one').show();
+          $('p.message').text(`WINNER ${player_1}!`);
+        } else if (containsAll(winCombos, p2box)) {
+          $('#board').hide();
+          $('#finish').removeClass('screen-win-one screen-win-two screen-win-tie');
+          $('#finish').addClass("screen-win-two").show();
+          $('p.message').text(`WINNER Computer!`);;
+        }
+      }
+    });
+  }
+
+  const playerMoves = () => {
+    $('.box').on('click', function (event) {
+      if ($(this).hasClass('box-filled-1')) {return}
+      if ($(this).hasClass('box-filled-2')) {return}
+      if ($('#player1').is('.active')) {
+        p1box.push($(this).attr('class').split(' ')[1]);
+        $(this).toggleClass('box-filled box-filled-1');
+        $(this).attr('disabled', true);
+        $('#player1').toggleClass('active');
+        $('#player2').toggleClass('active');
+        if (containsAll(winCombos, p1box)) {
+          $('#board').hide();
+          $('#finish').removeClass('screen-win-one screen-win-two screen-win-tie');
+          $('#finish').addClass('screen-win-one').show();
+          $('p.message').text(`WINNER ${player_1}!`);
+          return;
+        }
+      } else if ($('#player2').is('.active')){
+        p2box.push($(this).attr('class').split(' ')[1]);
+        $(this).toggleClass('box-filled box-filled-2');
+        $(this).attr('disabled', true);
+        $('#player1').toggleClass('active');
+        $('#player2').toggleClass('active');
+        if (containsAll(winCombos, p2box)) {
+          $('#board').hide();
+          $('#finish').removeClass('screen-win-one screen-win-two screen-win-tie');
+          $('#finish').addClass("screen-win-two").show();
+          $('p.message').text(`WINNER ${player_2}!`);
+          return;
+        }
+      }
+    });
+  }
 
   const hoverCheck = () => {
     $('.box').hover(
@@ -133,23 +196,21 @@ const playerMoves = () => {
           $('#finish').addClass('screen-win-tie');
         }
       }
-    })
+    });
   }
 
 const newGame = () => {
   $('.newButton').on('click', function() {
     p1box = [];
     p2box = [];
+    allbox = [];
     $('.names').remove();
     $('.box')
       .removeClass('box-filled box-filled-1 box-filled-2')
       .css('background-image', '');
     startScreen();
-    hoverCheck();
-    playerMoves();
-    tieScreen();
   });
 }
-newGame();
+
 
 }());
