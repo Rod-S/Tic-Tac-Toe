@@ -10,17 +10,13 @@
     ['box_3', 'box_6', 'box_9'],
     ['box_1', 'box_5', 'box_9'],
     ['box_3', 'box_5', 'box_7']];
-  //define player 1 and player 2 arrays that will hold selected moves
+  //define player 1 and player 2 arrays that will hold selected moves, respectively
   let p1box = [];
   let p2box = [];
   //convert all li box elements into a single array
   let boxes = $('.box').toArray();
 
-
-  /*evaluate p1box or p2box pArray to check if either array includes every value of any of the
-  arrays within winCombos 2d array.
-  ie) check if p1box or p2box has a winning row/column/diagonal combination defined in winCombos.
-  */
+  //check if p1box or p2box contains a winning row/column/diagonal combination defined in winCombos.
   const containsAll = (winCombos, pArray) => {
      for (var i=0; i < winCombos.length; i++) {
       if(winCombos[i].every(value => pArray.indexOf(value) != -1)) return true;
@@ -83,7 +79,6 @@
         //begin playerMoves() game functionality
         playerMoves();
         hoverCheck();
-        newGame();
       });
     });
   }
@@ -139,14 +134,17 @@
         //check if p1box array contains any of the winning combinations, if so:
         if (containsAll(winCombos, p1box)) {
           winOneScreen();
+          newGame();
         //check if p2box array contains any of the winning combinations, if so:
         } else if (containsAll(winCombos, p2box)) {
-          winTwoScreen();
+            winTwoScreen();
+            newGame();
         //check if all boxes have been played, if no winning combinations:
         } else if ($('.box-filled').length === 9) {
             //(note: p1 has the last move, so following conditional only checks if p1box is t/f)
             if (!containsAll(winCombos, p1box)){
-            tieScreen();
+              tieScreen();
+              newGame();
             }
           }
       }
@@ -173,11 +171,14 @@
         //check if p1box array contains any of the winning combinations, if so:
         if (containsAll(winCombos, p1box)) {
           winOneScreen();
+          newGame();
+          return;
         //check if all boxes have been played, if no winning combinations:
         } else if ($('.box-filled').length === 9) {
             //(note: p1 has the last move, so following conditional only checks if p1box is t/f)
             if (!containsAll(winCombos, p1box)){
             tieScreen();
+            newGame();
             }
           }
       //if it's currently player 2's turn:
@@ -193,10 +194,13 @@
           //check if p2box array contains any of the winning combinations, if so:
           if (containsAll(winCombos, p2box)) {
             winTwoScreen();
+            newGame();
           }
         }
     });
   }
+
+
 
   //box mouse hover behavior
   const hoverCheck = () => {
