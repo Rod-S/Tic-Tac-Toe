@@ -58,7 +58,6 @@
         //begin computerMoves() game functionality
         computerMoves();
         hoverCheck();
-        newGame();
       });
 
       //if 2-player button is clicked:
@@ -172,7 +171,6 @@
         if (containsAll(winCombos, p1box)) {
           winOneScreen();
           newGame();
-          return;
         //check if all boxes have been played, if no winning combinations:
         } else if ($('.box-filled').length === 9) {
             //(note: p1 has the last move, so following conditional only checks if p1box is t/f)
@@ -261,19 +259,9 @@
 
   //new game board wipe
   const newGame = () => {
-    //when New game button is clicked, reset fields to original values and display start screen
+    //when New game button is clicked, reload the game
     $('.newButton').on('click', function() {
-      player_1 = '';
-      player_2 = '';
-      p1box = [];
-      p2box = [];
-      $('.names').remove();
-      $('.box')
-        .removeClass('box-filled box-filled-1 box-filled-2')
-        .attr('disabled', false)
-        .css('background-image', '');
-      boxes = $('.box').toArray();
-      startScreen();
+      location.reload(true);
     });
   }
 }());
