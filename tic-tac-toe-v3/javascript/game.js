@@ -24,64 +24,59 @@
       return false;
   };
 
+    const playerSetup = () => {
+      //hide the start screen, add active class and 1st turn on player 1
+      window.player_1 = player_1;
+      window.player_2 = player_2;
+      $('#start').hide();
+      $('#board').show();
+      //append names to board
+      $('#player1').append('<h3 class=names>' + player_1 + '</h2>');
+      $('#player2').append('<h3 class=names>' + player_2 + '</h2>');
+      $('#player2').removeClass('active');
+      $('#player1').addClass('active');
+    }
+
   //start screen and game start options
   const startScreen = () => {
-
     let player_1;
     let player_2;
     //show start screen and hide the board and win screens
     $('#start').show();
     $('#board').hide();
     $('#finish').hide();
-    //when start button is clicked:
-    $('#startButton').on('click', function (){
-      //replace start game button with 1-player and 2-player button options
-      $('#startButton').after('<a href="#" class="button" id="start1">1-Player</a>');
-      $('#start1').after('<a href="#" class="button" id="start2">2-Player</a>');
-      $('#startButton').hide();
-
-      //if 1-player button is clicked:
-      $("#start1").on('click', function(){
-        //enter player 1 name
-        player_1 = prompt('Please enter a name for player 1', 'Player 1');
-        player_2 = 'Computer';
-        window.player_1 = player_1;
-        window.player_2 = player_2;
-        //hide the start screen, add active class and 1st turn on player 1
-        $('#start').hide();
-        $('#board').show();
-        //append names to board
-        $('#player1').append('<h3 class=names>' + player_1 + '</h2>');
-        $('#player2').append('<h3 class=names>' + player_2 + '</h2>');
-        $('#player2').removeClass('active');
-        $('#player1').addClass('active');
-        //begin computerMoves() game functionality
-        computerMoves();
-        hoverCheck();
-      });
-
-      //if 2-player button is clicked:
-      $('#start2').on('click', function (){
-        //enter names for player 1 and player 2
-        player_1 = prompt('Please enter a name for player 1', 'Player 1');
-        player_2 = prompt('Please enter a name for player 2', 'Player 2');
-        window.player_1 = player_1;
-        window.player_2 = player_2;
-        //hide the start screen, add active class and 1st turn on player 1
-        $('#start').hide();
-        $('#board').show();
-        //append names to board
-        $('#player1').append('<h3 class=names>' + player_1 + '</h2>');
-        $('#player2').append('<h3 class=names>' + player_2 + '</h2>');
-        $('#player2').removeClass('active');
-        $('#player1').addClass('active');
-        //begin playerMoves() game functionality
-        playerMoves();
-        hoverCheck();
-      });
-    });
   }
   startScreen();
+
+
+  //when start button is clicked:
+  $('#startButton').on('click', function () {
+    //replace start game button with 1-player and 2-player button options
+    $('#startButton').after('<a href="#" class="button" id="start1">1-Player</a>');
+    $('#start1').after('<a href="#" class="button" id="start2">2-Player</a>');
+    $('#startButton').hide();
+  })
+
+  //if 1-player button is clicked:
+  $("body").on('click', "#start1", function(){
+    //enter player 1 name
+    player_1 = prompt('Please enter a name for player 1', 'Player 1');
+    player_2 = 'Computer';
+    playerSetup();
+    computerMoves();
+    hoverCheck();
+  });
+
+  //if 2-player button is clicked:
+  $('body').on('click', '#start2', function (){
+    //enter names for player 1 and player 2
+    player_1 = prompt('Please enter a name for player 1', 'Player 1');
+    player_2 = prompt('Please enter a name for player 2', 'Player 2');
+    playerSetup();
+    playerMoves();
+    hoverCheck();
+  });
+
 
   //player vs. computer game functionality
   const computerMoves = () => {
