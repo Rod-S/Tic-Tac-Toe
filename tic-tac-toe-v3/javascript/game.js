@@ -15,7 +15,10 @@
   let p2box = [];
   //convert all li box elements into a single array
   let boxes = $('.box').toArray();
-
+  //RNG from 0 to max value
+  let getRandomNumber = (max) => {
+    return Math.floor(Math.random() * Math.floor(max));
+  };
   //check if p1box or p2box contains a winning row/column/diagonal combination defined in winCombos.
   const containsAll = (winCombos, pArray) => {
      for (var i=0; i < winCombos.length; i++) {
@@ -24,18 +27,18 @@
       return false;
   };
 
-    const playerSetup = () => {
-      //hide the start screen, add active class and 1st turn on player 1
-      window.player_1 = player_1;
-      window.player_2 = player_2;
-      $('#start').hide();
-      $('#board').show();
-      //append names to board
-      $('#player1').append('<h3 class=names>' + player_1 + '</h2>');
-      $('#player2').append('<h3 class=names>' + player_2 + '</h2>');
-      $('#player2').removeClass('active');
-      $('#player1').addClass('active');
-    }
+  const playerSetup = () => {
+    //hide the start screen, add active class and 1st turn on player 1
+    window.player_1 = player_1;
+    window.player_2 = player_2;
+    $('#start').hide();
+    $('#board').show();
+    //append names to board
+    $('#player1').append('<h3 class=names>' + player_1 + '</h2>');
+    $('#player2').append('<h3 class=names>' + player_2 + '</h2>');
+    $('#player2').removeClass('active');
+    $('#player1').addClass('active');
+  }
 
   //start screen and game start options
   const startScreen = () => {
@@ -49,7 +52,7 @@
   startScreen();
 
 
-  //when start button is clicked:
+  //start game handler
   $('#startButton').on('click', function () {
     //replace start game button with 1-player and 2-player button options
     $('#startButton').after('<a href="#" class="button" id="start1">1-Player</a>');
@@ -57,35 +60,29 @@
     $('#startButton').hide();
   })
 
-  //if 1-player button is clicked:
+  //1 player button handler
   $("body").on('click', "#start1", function(){
     //enter player 1 name
     player_1 = prompt('Please enter a name for player 1', 'Player 1');
     player_2 = 'Computer';
     playerSetup();
-    computerMoves();
+    computerGame();
     hoverCheck();
   });
 
-  //if 2-player button is clicked:
+  //2 player button handler
   $('body').on('click', '#start2', function (){
     //enter names for player 1 and player 2
     player_1 = prompt('Please enter a name for player 1', 'Player 1');
     player_2 = prompt('Please enter a name for player 2', 'Player 2');
     playerSetup();
-    playerMoves();
+    playerGame();
     hoverCheck();
   });
 
 
   //player vs. computer game functionality
-  const computerMoves = () => {
-
-    //RNG from 0 to max value
-    let getRandomNumber = (max) => {
-      return Math.floor(Math.random() * Math.floor(max));
-    };
-
+  const computerGame = () => {
     //computer will select an unused box from available moves in boxes array
     let randomBox = (array) => {
       //store random number within index
@@ -146,7 +143,7 @@
   }
 
   //2-player game functionality
-  const playerMoves = () => {
+  const playerGame = () => {
     //when a box is clicked:
     $('.box').on('click', function (event) {
       //do nothing if box is already in play
@@ -193,36 +190,6 @@
     });
   }
 
-
-
-  //box mouse hover behavior
-  const hoverCheck = () => {
-    //on mouse-in on box element:
-    $('.box').hover(
-      function (event) {
-      //do nothing if the current box has already been filled
-      if ($(this).hasClass('box-filled-1')) {return}
-      if ($(this).hasClass('box-filled-2')) {return}
-      //if player1 is active show O symbol
-      if ($('#player1').is('.active')) {
-        $(this).css("background-image", "url(img/o.svg)");
-      //if player2 is active show X symbol
-      } else if ($('#player2').is('.active')) {
-        $(this).css("background-image", "url(img/x.svg)");
-      }
-    },
-    //on mouse-out on box element:
-    function (event) {
-      if ($(this).hasClass('box-filled-1')) {return}
-      if ($(this).hasClass('box-filled-2')) {return}
-      if ($('#player1').is('.active')) {
-        $(this).css("background-image", '');
-      } else if ($('#player2').is('.active')) {
-        $(this).css("background-image", '');
-      }
-      });
-  };
-
   //Player 1 win screen
   const winOneScreen = () => {
     //hide board and display 1st player win screen elements on finish screen
@@ -259,4 +226,32 @@
       location.reload(true);
     });
   }
+
+  //box mouse hover behavior
+  const hoverCheck = () => {
+    //on mouse-in on box element:
+    $('.box').hover(
+        function (event) {
+          //do nothing if the current box has already been filled
+          if ($(this).hasClass('box-filled-1')) {return}
+          if ($(this).hasClass('box-filled-2')) {return}
+          //if player1 is active show O symbol
+          if ($('#player1').is('.active')) {
+            $(this).css("background-image", "url(img/o.svg)");
+            //if player2 is active show X symbol
+          } else if ($('#player2').is('.active')) {
+            $(this).css("background-image", "url(img/x.svg)");
+          }
+        },
+        //on mouse-out on box element:
+        function (event) {
+          if ($(this).hasClass('box-filled-1')) {return}
+          if ($(this).hasClass('box-filled-2')) {return}
+          if ($('#player1').is('.active')) {
+            $(this).css("background-image", '');
+          } else if ($('#player2').is('.active')) {
+            $(this).css("background-image", '');
+          }
+        });
+  };
 }());
