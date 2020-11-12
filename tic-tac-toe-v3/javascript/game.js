@@ -1,4 +1,11 @@
-(function ticTacToe(){
+$(() =>{
+
+  //define player 1 and player 2 arrays that will hold selected moves, respectively
+  let p1box = [];
+  let p2box = [];
+
+  //convert all li box elements into a single array
+  let boxes = $('.box').toArray();
 
   //2D array of possible winning combinations
   const winCombos = [
@@ -10,21 +17,46 @@
     ['box_3', 'box_6', 'box_9'],
     ['box_1', 'box_5', 'box_9'],
     ['box_3', 'box_5', 'box_7']];
-  //define player 1 and player 2 arrays that will hold selected moves, respectively
-  let p1box = [];
-  let p2box = [];
-  //convert all li box elements into a single array
-  let boxes = $('.box').toArray();
-  //RNG from 0 to max value
+
+  //RNG
   let getRandomNumber = (max) => {
     return Math.floor(Math.random() * Math.floor(max));
   };
+
   //check if p1box or p2box contains a winning row/column/diagonal combination defined in winCombos.
-  const containsAll = (winCombos, pArray) => {
+  const winCheck = (winCombos, pArray) => {
      for (var i=0; i < winCombos.length; i++) {
-      if(winCombos[i].every(value => pArray.indexOf(value) != -1)) return true;
+      if(winCombos[i].every(value => pArray.indexOf(value) !== -1)) return true
      }
-      return false;
+      return false
+  };
+
+  //game board mouse hover behavior
+  const boxHoverBehavior = () => {
+    //on mouse-in on box element:
+    $('.box').hover(
+        function (event) {
+          //do nothing if the current box has already been filled
+          if ($(this).hasClass('box-filled-1')) {return}
+          if ($(this).hasClass('box-filled-2')) {return}
+          //if player1 is active show O symbol
+          if ($('#player1').is('.active')) {
+            $(this).css("background-image", "url(img/o.svg)");
+            //if player2 is active show X symbol
+          } else if ($('#player2').is('.active')) {
+            $(this).css("background-image", "url(img/x.svg)");
+          }
+        },
+        //on mouse-out on box element:
+        function (event) {
+          if ($(this).hasClass('box-filled-1')) {return}
+          if ($(this).hasClass('box-filled-2')) {return}
+          if ($('#player1').is('.active')) {
+            $(this).css("background-image", '');
+          } else if ($('#player2').is('.active')) {
+            $(this).css("background-image", '');
+          }
+        });
   };
 
   const playerSetup = () => {
@@ -34,6 +66,7 @@
     $('#start').hide();
     $('#board').show();
     //append names to board
+    $('.names').remove();
     $('#player1').append('<h3 class=names>' + player_1 + '</h2>');
     $('#player2').append('<h3 class=names>' + player_2 + '</h2>');
     $('#player2').removeClass('active');
@@ -49,16 +82,43 @@
     $('#board').hide();
     $('#finish').hide();
   }
-  startScreen();
 
+  //Player 1 win screen
+  const winOneScreen = () => {
+    $('#finish').addClass('screen-win-one').show();
+    $('p.message').text(`WINNER ${player_1}!`);
+  };
 
-  //start game handler
+  //player 2 win screen
+  const winTwoScreen = () => {
+    $('#finish').addClass("screen-win-two").show();
+    $('p.message').text(`WINNER ${player_2}!`);
+  };
+
+  //tie game win screen
+  const tieScreen = () => {
+    $('#finish').addClass('screen-win-tie').show();
+    $('p.message').text(`IT'S A TIE!`);
+
+  };
+
+  //start game button handler
   $('#startButton').on('click', function () {
     //replace start game button with 1-player and 2-player button options
     $('#startButton').after('<a href="#" class="button" id="start1">1-Player</a>');
     $('#start1').after('<a href="#" class="button" id="start2">2-Player</a>');
     $('#startButton').hide();
   })
+
+  //new game board wipe handler
+  $('.newButton').on('click', function() {
+    p1box = [];
+    p2box = [];
+    $('#board').hide();
+    $('#finish').removeClass('screen-win-one screen-win-two screen-win-tie');
+    $('li').removeClass(['box-filled', 'box-filled-1', 'box-filled-2']).css('background-image', 'none');
+    startScreen();
+  });
 
   //1 player button handler
   $("body").on('click', "#start1", function(){
@@ -67,7 +127,7 @@
     player_2 = 'Computer';
     playerSetup();
     computerGame();
-    hoverCheck();
+    boxHoverBehavior();
   });
 
   //2 player button handler
@@ -77,11 +137,11 @@
     player_2 = prompt('Please enter a name for player 2', 'Player 2');
     playerSetup();
     playerGame();
-    hoverCheck();
+    boxHoverBehavior();
   });
 
 
-  //player vs. computer game functionality
+  //solo game functionality
   const computerGame = () => {
     //computer will select an unused box from available moves in boxes array
     let randomBox = (array) => {
@@ -95,7 +155,6 @@
       //once move is used, remove from boxes array
       boxes.splice(index, 1);
     };
-
     //when a box is clicked:
     $('.box').on('click', function (event) {
       //do nothing if box is already in play
@@ -123,19 +182,16 @@
           $('#player1').toggleClass('active');
         }
         //check if p1box array contains any of the winning combinations, if so:
-        if (containsAll(winCombos, p1box)) {
+        if (winCheck(winCombos, p1box)) {
           winOneScreen();
-          newGame();
         //check if p2box array contains any of the winning combinations, if so:
-        } else if (containsAll(winCombos, p2box)) {
+        } else if (winCheck(winCombos, p2box)) {
             winTwoScreen();
-            newGame();
         //check if all boxes have been played, if no winning combinations:
         } else if ($('.box-filled').length === 9) {
             //(note: p1 has the last move, so following conditional only checks if p1box is t/f)
-            if (!containsAll(winCombos, p1box)){
+            if (!winCheck(winCombos, p1box)){
               tieScreen();
-              newGame();
             }
           }
       }
@@ -160,15 +216,13 @@
         $('#player1').toggleClass('active');
         $('#player2').toggleClass('active');
         //check if p1box array contains any of the winning combinations, if so:
-        if (containsAll(winCombos, p1box)) {
+        if (winCheck(winCombos, p1box)) {
           winOneScreen();
-          newGame();
         //check if all boxes have been played, if no winning combinations:
         } else if ($('.box-filled').length === 9) {
             //(note: p1 has the last move, so following conditional only checks if p1box is t/f)
-            if (!containsAll(winCombos, p1box)){
+            if (!winCheck(winCombos, p1box)){
             tieScreen();
-            newGame();
             }
           }
       //if it's currently player 2's turn:
@@ -182,76 +236,14 @@
           $('#player1').toggleClass('active');
           $('#player2').toggleClass('active');
           //check if p2box array contains any of the winning combinations, if so:
-          if (containsAll(winCombos, p2box)) {
+          if (winCheck(winCombos, p2box)) {
             winTwoScreen();
-            newGame();
           }
         }
     });
   }
 
-  //Player 1 win screen
-  const winOneScreen = () => {
-    //hide board and display 1st player win screen elements on finish screen
-    $('#board').hide();
-    $('#finish').removeClass('screen-win-one screen-win-two screen-win-tie');
-    $('#finish').addClass('screen-win-one').show();
-    $('p.message').text(`WINNER ${player_1}!`);
-  };
 
-  //player 2 win screen
-  const winTwoScreen = () => {
-    //hide board and display 2nd player win screen elements on finish screen
-    $('#board').hide();
-    $('#finish').removeClass('screen-win-one screen-win-two screen-win-tie');
-    $('#finish').addClass("screen-win-two").show();
-    $('p.message').text(`WINNER ${player_2}!`);
-  };
+  startScreen();
 
-  //tie game win screen
-  const tieScreen = () => {
-          //hide board and display tie screen elements on finish screen
-          $('#board').hide();
-          $('#finish').show();
-          $('p.message').text(`IT'S A TIE!`);
-          $('#finish').removeClass('screen-win-one screen-win-two screen-win-tie');
-          $('#finish').addClass('screen-win-tie');
-
-  };
-
-  //new game board wipe
-  const newGame = () => {
-    //when New game button is clicked, reload the game
-    $('.newButton').on('click', function() {
-      location.reload(true);
-    });
-  }
-
-  //box mouse hover behavior
-  const hoverCheck = () => {
-    //on mouse-in on box element:
-    $('.box').hover(
-        function (event) {
-          //do nothing if the current box has already been filled
-          if ($(this).hasClass('box-filled-1')) {return}
-          if ($(this).hasClass('box-filled-2')) {return}
-          //if player1 is active show O symbol
-          if ($('#player1').is('.active')) {
-            $(this).css("background-image", "url(img/o.svg)");
-            //if player2 is active show X symbol
-          } else if ($('#player2').is('.active')) {
-            $(this).css("background-image", "url(img/x.svg)");
-          }
-        },
-        //on mouse-out on box element:
-        function (event) {
-          if ($(this).hasClass('box-filled-1')) {return}
-          if ($(this).hasClass('box-filled-2')) {return}
-          if ($('#player1').is('.active')) {
-            $(this).css("background-image", '');
-          } else if ($('#player2').is('.active')) {
-            $(this).css("background-image", '');
-          }
-        });
-  };
-}());
+});
