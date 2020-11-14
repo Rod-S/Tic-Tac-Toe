@@ -23,14 +23,6 @@ $(() =>{
     return Math.floor(Math.random() * Math.floor(max));
   };
 
-  //check if p1box or p2box contains a winning row/column/diagonal combination defined in winCombos.
-  const winCheck = (winCombos, pArray) => {
-     for (var i=0; i < winCombos.length; i++) {
-      if(winCombos[i].every(value => pArray.indexOf(value) !== -1)) return true
-     }
-      return false
-  };
-
   //show current player's game piece image
   function mouseInEffect(e) {
     if ($(this).hasClass('box-filled-1')) {return}
@@ -80,9 +72,27 @@ $(() =>{
     $('#player1').addClass('active');
   }
 
+  //check if p1box or p2box contains a winning row/column/diagonal combination defined in winCombos.
+  const winCheck = (winCombos, pArray) => {
+    for (var i=0; i < winCombos.length; i++) {
+      if(winCombos[i].every(value => pArray.indexOf(value) !== -1)) return true
+    }
+    return false
+  };
+
   //REFACTOR THESE 3 into 1 function
+  // const setScreen(outcome) {
+  //   var cVal = '';
+  //   var tVal = '';
+  //   // check for value of argument
+  //     // set the values of cVal and tVal
+  //     //
+  //   $('#finish').addClass(cVal).show();
+  //   $('p.message').text(tVal);
+  // }
+
   //Player 1 win screen
-  const winOneScreen = (outcomevar1, var2) => {
+  const winOneScreen = () => {
     $('#finish').addClass('screen-win-one').show();
     $('p.message').text(`WINNER ${player_1}!`);
   };
@@ -97,18 +107,72 @@ $(() =>{
   const tieScreen = () => {
     $('#finish').addClass('screen-win-tie').show();
     $('p.message').text(`IT'S A TIE!`);
-
   };
 
-  // const setScreen(outcome) {
-  //   var cVal = '';
-  //   var tVal = '';
-  //   // check for vaalue of aargument
-  //     // set the values of cVal and tVal
-  //     //
-  //   $('#finish').addClass(cVal).show();
-  //   $('p.message').text(tVal);
-  // }
+  const winCheckScreen = () => {
+    //check if p1box array contains any of the winning combinations, if so:
+    if (winCheck(winCombos, p1box)) {
+      winOneScreen();
+      //check if p2box array contains any of the winning combinations, if so:
+    } else if (winCheck(winCombos, p2box)) {
+      winTwoScreen();
+      //check if all boxes have been played, if no winning combinations:
+    } else if ($('.box-filled').length === 9) {
+      //(note: p1 has the last move, so following conditional only checks if p1box is t/f)
+      if (!winCheck(winCombos, p1box)){
+        tieScreen();
+      }
+    }
+  }
+
+  //computer will select an unused box from available moves in boxes array
+  let randomizedMove = (array) => {
+    let index = getRandomNumber(array.length);
+    p2box.push($(array[index]).attr('class').split(' ')[1]);
+    $(array[index]).addClass('box-filled box-filled-2');
+    $(array[index]).attr('disabled', true);
+    //once move is used, remove from boxes array
+    array.splice(index, 1);
+  };
+
+  const player1Move = (e) => {
+    if ($('#player1').is('.active')) {
+      //find 'this' index within boxes array
+      let thisToBoxesIndex = boxes.indexOf(this);
+      //add box's 2nd class name to p1box array
+      p1box.push($(e.target).attr('class').split(' ')[1]);
+      //visually change box for player 1 chosen move and disable
+      $(e.target).toggleClass('box-filled box-filled-1').attr('disabled', true);
+      //once move is used, remove from boxes array
+      boxes.splice(thisToBoxesIndex, 1);
+      //player 1 turn ends, computer turn begins
+      $('#player1').toggleClass('active');
+      $('#player2').toggleClass('active');
+    }
+  }
+
+  const player2Move = (e) => {
+    if ($('#player2').is('.active')){
+      //add box's 2nd class name to p2box array
+      p2box.push($(e.target).attr('class').split(' ')[1]);
+      //visually change box for player 2 chosen move and disable
+      $(e.target).toggleClass('box-filled box-filled-2').attr('disabled', true);
+      //player 2 turn ends, player 1 begins
+      $('#player1').toggleClass('active');
+      $('#player2').toggleClass('active');
+    }
+  }
+
+  const computerMove = () => {
+    //if empty boxes are currently in play:
+    if (boxes.length !== 0) {
+      //run computer's move
+      randomizedMove(boxes);
+      //computer turn ends, player 1 turn begins
+      $('#player2').toggleClass('active');
+      $('#player1').toggleClass('active');
+    }
+  }
 
   //start game button handler
   $('#startButton').on('click', function () {
@@ -118,7 +182,7 @@ $(() =>{
     $('#startButton').hide();
   })
 
-  //new game board wipe handler
+  //new game button board wipe handler
   $('.newButton').on('click', function() {
     p1box = [];
     p2box = [];
@@ -128,7 +192,7 @@ $(() =>{
     startScreen();
   });
 
-  //1 player button handler
+  //1-player button handler
   $("body").on('click', "#start1", function(){
     //enter player 1 name
     player_1 = prompt('Please enter a name for player 1', 'Player 1');
@@ -138,7 +202,7 @@ $(() =>{
     boxHoverBehavior();
   });
 
-  //2 player button handler
+  //2-player button handler
   $('body').on('click', '#start2', function (){
     //enter names for player 1 and player 2
     player_1 = prompt('Please enter a name for player 1', 'Player 1');
@@ -148,110 +212,36 @@ $(() =>{
     boxHoverBehavior();
   });
 
-
-  //computer will select an unused box from available moves in boxes array
-  let randomBox = (array) => {
-    let index = getRandomNumber(array.length);
-    p2box.push($(array[index]).attr('class').split(' ')[1]);
-    $(array[index]).addClass('box-filled box-filled-2');
-    $(array[index]).attr('disabled', true);
-    //once move is used, remove from boxes array
-    array.splice(index, 1);
-  };
-
-
-
-  //solo game functionality
+  //1-player game functionality (box click handler)
   const pveGame = () => {
     //when a box is clicked:
-    $('.box').on('click', function (event) {
-      //do nothing if box is already in play
-      if ($(this).hasClass('box-filled-1')) {return}
-      if ($(this).hasClass('box-filled-2')) {return}
+    $('.box').on('click', function(e) {
+      //do nothing if box is already in play and claimed by p1
+      if ($(this).hasClass('box-filled-1')) return
+      //do nothing if box is already in play and claimed by p2
+      if ($(this).hasClass('box-filled-2')) return
       if ($('#player1').is('.active')) {
-        //find 'this' index within boxes array
-        let thisToBoxesIndex = boxes.indexOf(this);
-        //add box's 2nd class name to p1box array
-        p1box.push($(this).attr('class').split(' ')[1]);
-        //visually change box for player 1 chosen move and disable
-        $(this).toggleClass('box-filled box-filled-1');
-        $(this).attr('disabled', true);
-        //once move is used, remove from boxes array
-        boxes.splice(thisToBoxesIndex, 1);
-        //player 1 turn ends, computer turn begins
-        $('#player1').toggleClass('active');
-        $('#player2').toggleClass('active');
-        //if empty boxes are currently in play:
-        if (boxes.length !== 0) {
-          //run computer's move
-          randomBox(boxes);
-          //computer turn ends, player 1 turn begins
-          $('#player2').toggleClass('active');
-          $('#player1').toggleClass('active');
-        }
-        //check if p1box array contains any of the winning combinations, if so:
-        if (winCheck(winCombos, p1box)) {
-          winOneScreen();
-        //check if p2box array contains any of the winning combinations, if so:
-        } else if (winCheck(winCombos, p2box)) {
-            winTwoScreen();
-        //check if all boxes have been played, if no winning combinations:
-        } else if ($('.box-filled').length === 9) {
-            //(note: p1 has the last move, so following conditional only checks if p1box is t/f)
-            if (!winCheck(winCombos, p1box)){
-              tieScreen();
-            }
-          }
+        player1Move(e);
+        computerMove();
       }
-    });
+      winCheckScreen();
+    })
   }
 
-  //2-player game functionality
+  //2-player game functionality (box click handler)
   const pvpGame = () => {
     //when a box is clicked:
-    $('.box').on('click', function (event) {
-      //do nothing if box is already in play
-      if ($(this).hasClass('box-filled-1')) {return}
-      if ($(this).hasClass('box-filled-2')) {return}
-      //if it's currently player 1's turn:
+    $('.box').on('click', function (e) {
+      if ($(this).hasClass('box-filled-1')) return
+      if ($(this).hasClass('box-filled-2')) return
       if ($('#player1').is('.active')) {
-        //add box's 2nd class name to p1box array
-        p1box.push($(this).attr('class').split(' ')[1]);
-        //visually change box for player 1 chosen move and disable
-        $(this).toggleClass('box-filled box-filled-1');
-        $(this).attr('disabled', true);
-        //player 1 turn ends, player 2 begins
-        $('#player1').toggleClass('active');
-        $('#player2').toggleClass('active');
-        //check if p1box array contains any of the winning combinations, if so:
-        if (winCheck(winCombos, p1box)) {
-          winOneScreen();
-        //check if all boxes have been played, if no winning combinations:
-        } else if ($('.box-filled').length === 9) {
-            //(note: p1 has the last move, so following conditional only checks if p1box is t/f)
-            if (!winCheck(winCombos, p1box)){
-            tieScreen();
-            }
-          }
-      //if it's currently player 2's turn:
-      } else if ($('#player2').is('.active')){
-          //add box's 2nd class name to p2box array
-          p2box.push($(this).attr('class').split(' ')[1]);
-          //visually change box for player 2 chosen move and disable
-          $(this).toggleClass('box-filled box-filled-2');
-          $(this).attr('disabled', true);
-          //player 2 turn ends, player 1 begins
-          $('#player1').toggleClass('active');
-          $('#player2').toggleClass('active');
-          //check if p2box array contains any of the winning combinations, if so:
-          if (winCheck(winCombos, p2box)) {
-            winTwoScreen();
-          }
-        }
-    });
+        player1Move(e);
+      } else {
+        player2Move(e);
+      }
+      winCheckScreen();
+    })
   }
 
-
   startScreen();
-
 });
