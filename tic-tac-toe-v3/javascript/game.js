@@ -31,36 +31,43 @@ $(() =>{
       return false
   };
 
-  //game board mouse hover behavior
+  //show current player's game piece image
+  function mouseInEffect(e) {
+    if ($(this).hasClass('box-filled-1')) {return}
+    if ($(this).hasClass('box-filled-2')) {return}
+    if ($('#player1').is('.active')) {
+      $(this).css("background-image", "url(img/o.svg)");
+    } else if ($('#player2').is('.active')) {
+      $(this).css("background-image", "url(img/x.svg)");
+    }
+  }
+  //remove current player's game piece image
+  function mouseOutEffect(e) {
+    if ($(this).hasClass('box-filled-1')) {return}
+    if ($(this).hasClass('box-filled-2')) {return}
+    if ($('#player1').is('.active')) {
+      $(this).css("background-image", '');
+    } else if ($('#player2').is('.active')) {
+      $(this).css("background-image", '');
+    }
+  }
+
+  //game board space visual hover behavior
   const boxHoverBehavior = () => {
-    //on mouse-in on box element:
-    $('.box').hover(
-        function (event) {
-          //do nothing if the current box has already been filled
-          if ($(this).hasClass('box-filled-1')) {return}
-          if ($(this).hasClass('box-filled-2')) {return}
-          //if player1 is active show O symbol
-          if ($('#player1').is('.active')) {
-            $(this).css("background-image", "url(img/o.svg)");
-            //if player2 is active show X symbol
-          } else if ($('#player2').is('.active')) {
-            $(this).css("background-image", "url(img/x.svg)");
-          }
-        },
-        //on mouse-out on box element:
-        function (event) {
-          if ($(this).hasClass('box-filled-1')) {return}
-          if ($(this).hasClass('box-filled-2')) {return}
-          if ($('#player1').is('.active')) {
-            $(this).css("background-image", '');
-          } else if ($('#player2').is('.active')) {
-            $(this).css("background-image", '');
-          }
-        });
+    $('.box').hover(mouseInEffect, mouseOutEffect);
   };
 
+  //start screen with options
+  const startScreen = () => {
+    let player_1;
+    let player_2;
+    $('#start').show();
+    $('#board').hide();
+    $('#finish').hide();
+  }
+
+  //Close start screen and begin the game on player 1's turn
   const playerSetup = () => {
-    //hide the start screen, add active class and 1st turn on player 1
     window.player_1 = player_1;
     window.player_2 = player_2;
     $('#start').hide();
@@ -73,18 +80,9 @@ $(() =>{
     $('#player1').addClass('active');
   }
 
-  //start screen and game start options
-  const startScreen = () => {
-    let player_1;
-    let player_2;
-    //show start screen and hide the board and win screens
-    $('#start').show();
-    $('#board').hide();
-    $('#finish').hide();
-  }
-
+  //REFACTOR THESE 3 into 1 function
   //Player 1 win screen
-  const winOneScreen = () => {
+  const winOneScreen = (outcomevar1, var2) => {
     $('#finish').addClass('screen-win-one').show();
     $('p.message').text(`WINNER ${player_1}!`);
   };
@@ -101,6 +99,16 @@ $(() =>{
     $('p.message').text(`IT'S A TIE!`);
 
   };
+
+  // const setScreen(outcome) {
+  //   var cVal = '';
+  //   var tVal = '';
+  //   // check for vaalue of aargument
+  //     // set the values of cVal and tVal
+  //     //
+  //   $('#finish').addClass(cVal).show();
+  //   $('p.message').text(tVal);
+  // }
 
   //start game button handler
   $('#startButton').on('click', function () {
@@ -126,7 +134,7 @@ $(() =>{
     player_1 = prompt('Please enter a name for player 1', 'Player 1');
     player_2 = 'Computer';
     playerSetup();
-    computerGame();
+    pveGame();
     boxHoverBehavior();
   });
 
@@ -136,25 +144,25 @@ $(() =>{
     player_1 = prompt('Please enter a name for player 1', 'Player 1');
     player_2 = prompt('Please enter a name for player 2', 'Player 2');
     playerSetup();
-    playerGame();
+    pvpGame();
     boxHoverBehavior();
   });
 
 
+  //computer will select an unused box from available moves in boxes array
+  let randomBox = (array) => {
+    let index = getRandomNumber(array.length);
+    p2box.push($(array[index]).attr('class').split(' ')[1]);
+    $(array[index]).addClass('box-filled box-filled-2');
+    $(array[index]).attr('disabled', true);
+    //once move is used, remove from boxes array
+    array.splice(index, 1);
+  };
+
+
+
   //solo game functionality
-  const computerGame = () => {
-    //computer will select an unused box from available moves in boxes array
-    let randomBox = (array) => {
-      //store random number within index
-      let index = getRandomNumber(boxes.length);
-      //add box's 2nd class name to p2box array
-      p2box.push($(boxes[index]).attr('class').split(' ')[1]);
-      //visually change box for computer chosen move and disable
-      $(boxes[index]).addClass('box-filled box-filled-2');
-      $(boxes[index]).attr('disabled', true);
-      //once move is used, remove from boxes array
-      boxes.splice(index, 1);
-    };
+  const pveGame = () => {
     //when a box is clicked:
     $('.box').on('click', function (event) {
       //do nothing if box is already in play
@@ -199,7 +207,7 @@ $(() =>{
   }
 
   //2-player game functionality
-  const playerGame = () => {
+  const pvpGame = () => {
     //when a box is clicked:
     $('.box').on('click', function (event) {
       //do nothing if box is already in play
