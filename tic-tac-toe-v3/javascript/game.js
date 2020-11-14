@@ -125,16 +125,6 @@ $(() =>{
     }
   }
 
-  //computer will select an unused box from available moves in boxes array
-  let randomizedMove = (array) => {
-    let index = getRandomNumber(array.length);
-    p2box.push($(array[index]).attr('class').split(' ')[1]);
-    $(array[index]).addClass('box-filled box-filled-2');
-    $(array[index]).attr('disabled', true);
-    //once move is used, remove from boxes array
-    array.splice(index, 1);
-  };
-
   const player1Move = (e) => {
     if ($('#player1').is('.active')) {
       //find 'this' index within boxes array
@@ -162,6 +152,16 @@ $(() =>{
       $('#player2').toggleClass('active');
     }
   }
+
+  //computer will select an unused box from available moves in boxes array
+  let randomizedMove = (array) => {
+    let index = getRandomNumber(array.length);
+    p2box.push($(array[index]).attr('class').split(' ')[1]);
+    $(array[index]).addClass('box-filled box-filled-2');
+    $(array[index]).attr('disabled', true);
+    //once move is used, remove from boxes array
+    array.splice(index, 1);
+  };
 
   const computerMove = () => {
     //if empty boxes are currently in play:
@@ -214,34 +214,24 @@ $(() =>{
 
   //1-player game functionality (box click handler)
   const pveGame = () => {
-    //when a box is clicked:
     $('.box').on('click', function(e) {
-      //do nothing if box is already in play and claimed by p1
-      if ($(this).hasClass('box-filled-1')) return
-      //do nothing if box is already in play and claimed by p2
-      if ($(this).hasClass('box-filled-2')) return
-      if ($('#player1').is('.active')) {
-        player1Move(e);
-        computerMove();
-      }
+      //do nothing if box is already in play and claimed
+      if ($(this).hasClass('box-filled-1', 'box-filled-2')) return
+      //run specific game logic depending on which player's turn it is
+      $('#player1').is('.active') ? player1Move(e) : computerMove();
       winCheckScreen();
     })
   }
 
   //2-player game functionality (box click handler)
   const pvpGame = () => {
-    //when a box is clicked:
     $('.box').on('click', function (e) {
-      if ($(this).hasClass('box-filled-1')) return
-      if ($(this).hasClass('box-filled-2')) return
-      if ($('#player1').is('.active')) {
-        player1Move(e);
-      } else {
-        player2Move(e);
-      }
+      if ($(this).hasClass('box-filled-1', 'box-filled-2')) return
+      $('#player1').is('.active') ? player1Move(e) : player2Move(e);
       winCheckScreen();
     })
   }
+
 
   startScreen();
 });
