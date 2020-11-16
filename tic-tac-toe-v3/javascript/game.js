@@ -23,20 +23,19 @@ $(() =>{
     return Math.floor(Math.random() * Math.floor(max));
   };
 
-  //show current player's game piece image
+  //show current player's game piece image overlay
   function mouseInEffect(e) {
-    if ($(this).hasClass('box-filled-1')) {return}
-    if ($(this).hasClass('box-filled-2')) {return}
+    if ($(this).hasClass('box-filled')) {return}
     if ($('#player1').is('.active')) {
       $(this).css("background-image", "url(img/o.svg)");
     } else if ($('#player2').is('.active')) {
       $(this).css("background-image", "url(img/x.svg)");
     }
   }
-  //remove current player's game piece image
+
+  //remove current player's game piece image overlay
   function mouseOutEffect(e) {
-    if ($(this).hasClass('box-filled-1')) {return}
-    if ($(this).hasClass('box-filled-2')) {return}
+    if ($(this).hasClass('box-filled')) {return}
     if ($('#player1').is('.active')) {
       $(this).css("background-image", '');
     } else if ($('#player2').is('.active')) {
@@ -44,10 +43,8 @@ $(() =>{
     }
   }
 
-  //game board space visual hover behavior
-  const boxHoverBehavior = () => {
+  //game board visual hover behavior
     $('.box').hover(mouseInEffect, mouseOutEffect);
-  };
 
   //start screen with options
   const startScreen = () => {
@@ -66,10 +63,8 @@ $(() =>{
     $('#board').show();
     //append names to board
     $('.names').remove();
-    $('#player1').append('<h3 class=names>' + player_1 + '</h2>');
-    $('#player2').append('<h3 class=names>' + player_2 + '</h2>');
-    $('#player2').removeClass('active');
-    $('#player1').addClass('active');
+    $('#player1').addClass('active').append('<h3 class=names>' + player_1 + '</h2>');
+    $('#player2').removeClass('active').append('<h3 class=names>' + player_2 + '</h2>');
   }
 
   //check if p1box or p2box contains a winning row/column/diagonal combination defined in winCombos.
@@ -116,28 +111,27 @@ $(() =>{
       //check if p2box array contains any of the winning combinations, if so:
     } else if (winCheck(winCombos, p2box)) {
       winTwoScreen();
-      //check if all boxes have been played, if no winning combinations:
-    } else if ($('.box-filled').length === 9) {
-      //(note: p1 has the last move, so following conditional only checks if p1box is t/f)
-      if (!winCheck(winCombos, p1box)){
+      //check if all boxes have been played, if no winning combinations (p1box due to p1 having last playable move):
+    } else if (($('.box-filled').length === 9) && (!winCheck(winCombos, p1box))) {
         tieScreen();
-      }
     }
   }
 
   const player1Move = (e) => {
     if ($('#player1').is('.active')) {
       //find 'this' index within boxes array
-      let thisToBoxesIndex = boxes.indexOf(this);
+      let thisToBoxesIndex = boxes.indexOf(e.target);
       //add box's 2nd class name to p1box array
       p1box.push($(e.target).attr('class').split(' ')[1]);
       //visually change box for player 1 chosen move and disable
       $(e.target).toggleClass('box-filled box-filled-1').attr('disabled', true);
       //once move is used, remove from boxes array
       boxes.splice(thisToBoxesIndex, 1);
+      console.log(boxes);
       //player 1 turn ends, computer turn begins
       $('#player1').toggleClass('active');
       $('#player2').toggleClass('active');
+      computerMove();
     }
   }
 
@@ -153,6 +147,11 @@ $(() =>{
     }
   }
 
+  //minimax logic to predict un/favorable outcomes
+  let foresight = () => {
+
+  }
+
   //computer will select an unused box from available moves in boxes array
   let randomizedMove = (array) => {
     let index = getRandomNumber(array.length);
@@ -161,7 +160,7 @@ $(() =>{
     $(array[index]).attr('disabled', true);
     //once move is used, remove from boxes array
     array.splice(index, 1);
-  };
+  }
 
   const computerMove = () => {
     //if empty boxes are currently in play:
@@ -184,12 +183,16 @@ $(() =>{
 
   //new game button board wipe handler
   $('.newButton').on('click', function() {
-    p1box = [];
-    p2box = [];
-    $('#board').hide();
-    $('#finish').removeClass('screen-win-one screen-win-two screen-win-tie');
-    $('li').removeClass(['box-filled', 'box-filled-1', 'box-filled-2']).css('background-image', 'none');
-    startScreen();
+    // p1box = [];
+    // p2box = [];
+    // boxes = $('.box').toArray();
+    // $('#board').hide();
+    // $('#finish').removeClass('screen-win-one screen-win-two screen-win-tie');
+    // $('li').removeClass(['box-filled', 'box-filled-1', 'box-filled-2']).css('background-image', 'none');
+    // startScreen();
+
+    //TEMPORARY FIX, NEW GAME BREAKS FUNCTIONALITY (need to fully reset game values
+    window.location.reload();
   });
 
   //1-player button handler
@@ -199,7 +202,6 @@ $(() =>{
     player_2 = 'Computer';
     playerSetup();
     pveGame();
-    boxHoverBehavior();
   });
 
   //2-player button handler
@@ -209,16 +211,15 @@ $(() =>{
     player_2 = prompt('Please enter a name for player 2', 'Player 2');
     playerSetup();
     pvpGame();
-    boxHoverBehavior();
   });
 
   //1-player game functionality (box click handler)
   const pveGame = () => {
     $('.box').on('click', function(e) {
       //do nothing if box is already in play and claimed
-      if ($(this).hasClass('box-filled-1', 'box-filled-2')) return
+      if ($(this).hasClass('box-filled')) return
       //run specific game logic depending on which player's turn it is
-      $('#player1').is('.active') ? player1Move(e) : computerMove();
+      $('#player1').is('.active') ? player1Move(e) : null
       winCheckScreen();
     })
   }
@@ -226,7 +227,7 @@ $(() =>{
   //2-player game functionality (box click handler)
   const pvpGame = () => {
     $('.box').on('click', function (e) {
-      if ($(this).hasClass('box-filled-1', 'box-filled-2')) return
+      if ($(this).hasClass('box-filled')) return
       $('#player1').is('.active') ? player1Move(e) : player2Move(e);
       winCheckScreen();
     })
@@ -235,3 +236,4 @@ $(() =>{
 
   startScreen();
 });
+
